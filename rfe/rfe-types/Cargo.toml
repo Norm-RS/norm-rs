@@ -1,0 +1,48 @@
+[package]
+name = "rfe-types"
+description = "Shared types for the Rust Fintech Ecosystem (RFE): newtype IDs, hashing, Decimal utilities"
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+repository = "https://github.com/norm-rs/norm-rs"
+homepage = "https://github.com/norm-rs/norm-rs"
+documentation = "https://docs.rs/rfe-types"
+
+[features]
+default = []
+std = [
+    "serde/std",
+    "rust_decimal/std",
+    "uuid/std",
+    "thiserror/std",
+    "blake3/std"
+]
+v4 = ["uuid/v4"]
+gost-export = ["streebog"]
+
+[dependencies]
+blake3 = { workspace = true, default-features = false }
+rust_decimal = { workspace = true, default-features = false }
+serde = { workspace = true, default-features = false }
+serde_json = { workspace = true, default-features = false, features = ["alloc"] }
+thiserror = { workspace = true, default-features = false }
+uuid = { workspace = true, default-features = false }
+streebog = { workspace = true, default-features = false, optional = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "hashing"
+harness = false
+
+[[bench]]
+name = "streebog"
+harness = false
+required-features = ["gost-export"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
