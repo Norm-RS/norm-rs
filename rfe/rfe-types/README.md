@@ -1,5 +1,9 @@
 # rfe-types
 
+[![Crates.io](https://img.shields.io/crates/v/rfe-types.svg)](https://crates.io/crates/rfe-types)
+[![Documentation](https://docs.rs/rfe-types/badge.svg)](https://docs.rs/rfe-types)
+[![License](https://img.shields.io/crates/l/rfe-types.svg)](https://github.com/Norm-RS/norm-rs/blob/main/rfe/rfe-types/LICENSE)
+
 Core domain types and deterministic audit primitives for the Rust Fintech Ecosystem (RFE).
 
 ## Key Capabilities
