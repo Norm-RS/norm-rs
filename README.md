@@ -1,4 +1,6 @@
-# NORM Monorepo: The RegTech Power Trinity
+# NORM Monorepo
+
+## The Regtech Power Trinity
 
 Welcome to the **NORM Ecosystem** monorepo `norm-rs`.
 
