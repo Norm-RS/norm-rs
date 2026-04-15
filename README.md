@@ -6,6 +6,7 @@ This monorepo unites the domain logic, analyst tooling, and hardware-hardened ex
 
 ## Components
 
-1. **RFE (`rfe/`)**
+1. **RFE ([`rfe/`](rfe/README.md))**
    The core domain logic framework implementing Central Bank of Russia directives.
-   - `rfe-types`: Core domain types and deterministic audit primitives for the Rust Fintech Ecosystem (RFE).
+   - [`rfe-types`](rfe/rfe-types/README.md): Core domain types and deterministic audit primitives for the Rust Fintech Ecosystem (RFE).
+   - [`pdn-rs`](rfe/pdn-rs/README.md): Implements 6960-U / 7226-U (Debt Service-to-Income / PDN calculations).
