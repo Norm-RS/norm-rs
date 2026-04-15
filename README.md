@@ -12,3 +12,5 @@ This monorepo unites the domain logic, analyst tooling, and hardware-hardened ex
    The core domain logic framework implementing Central Bank of Russia directives.
    - [`rfe-types`](rfe/rfe-types/README.md): Core domain types and deterministic audit primitives for the Rust Fintech Ecosystem (RFE).
    - [`pdn-rs`](rfe/pdn-rs/README.md): Implements 6960-U / 7226-U (Debt Service-to-Income / PDN calculations).
+   - [`cbr-finapi-rs`](rfe/cbr-finapi-rs/README.md): Implements Federal Law 161-FZ (12 Antifraud Criteria).
+   - [`lending-state-rs`](rfe/lending-state-rs/README.md): Typestate FSM for lending and BNPL lifecycles with compile-time transition safety.
