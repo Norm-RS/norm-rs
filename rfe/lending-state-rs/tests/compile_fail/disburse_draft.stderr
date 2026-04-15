@@ -1,0 +1,8 @@
+error[E0599]: no method named `disburse` found for struct `LoanApplication<Draft>` in the current scope
+ --> tests/compile_fail/disburse_draft.rs:8:27
+  |
+8 |     let disbursed = draft.disburse();
+  |                           ^^^^^^^^ method not found in `LoanApplication<Draft>`
+  |
+  = note: the method was found for
+          - `LoanApplication<Approved>`

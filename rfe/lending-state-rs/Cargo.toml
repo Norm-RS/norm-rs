@@ -1,0 +1,27 @@
+[package]
+name = "lending-state-rs"
+description = "Typestate FSM for lending and BNPL lifecycles, guaranteeing valid state transitions at compile time."
+version.workspace = true
+edition.workspace = true
+license = "AGPL-3.0-only"
+authors.workspace = true
+repository = "https://github.com/norm-rs/norm-rs"
+homepage = "https://github.com/norm-rs/norm-rs"
+documentation = "https://docs.rs/lending-state-rs"
+
+[dependencies]
+rfe-types = { workspace = true, features = ["std", "v4"] }
+chrono = { workspace = true, features = ["clock"] }
+serde = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+trybuild = { workspace = true }
+
+[[bench]]
+name = "fsm"
+harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
