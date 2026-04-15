@@ -1,4 +1,8 @@
-# lending-state-rs
+# Lending State RS
+
+[![Crates.io](https://img.shields.io/crates/v/lending-state-rs.svg)](https://crates.io/crates/lending-state-rs)
+[![Documentation](https://docs.rs/lending-state-rs/badge.svg)](https://docs.rs/lending-state-rs)
+[![License](https://img.shields.io/crates/l/lending-state-rs.svg)](https://github.com/Norm-RS/norm-rs/blob/main/rfe/lending-state-rs/LICENSE)
 
 Typestate FSM for lending and BNPL lifecycles with compile-time transition safety.
 
