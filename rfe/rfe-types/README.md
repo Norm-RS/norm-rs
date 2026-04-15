@@ -1,4 +1,4 @@
-# rfe-types
+# RFE Types
 
 [![Crates.io](https://img.shields.io/crates/v/rfe-types.svg)](https://crates.io/crates/rfe-types)
 [![Documentation](https://docs.rs/rfe-types/badge.svg)](https://docs.rs/rfe-types)

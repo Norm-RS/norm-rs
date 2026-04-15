@@ -1,4 +1,8 @@
-# pdn-rs
+# PDN RS
+
+[![Crates.io](https://img.shields.io/crates/v/pdn-rs.svg)](https://crates.io/crates/pdn-rs)
+[![Documentation](https://docs.rs/pdn-rs/badge.svg)](https://docs.rs/pdn-rs)
+[![License](https://img.shields.io/crates/l/pdn-rs.svg)](https://github.com/Norm-RS/norm-rs/blob/main/rfe/pdn-rs/LICENSE)
 
 PDN (Debt Burden Ratio) calculation crate aligned with CBR 6960-U and amendments in 7226-U.
 
