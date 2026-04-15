@@ -1,0 +1,30 @@
+[package]
+name = "pdn-rs"
+description = "Pure-Rust CBR 6960-U / 7226-U Debt Burden Ratio (PDN) calculator"
+version.workspace = true
+edition.workspace = true
+license = "AGPL-3.0-only"
+authors.workspace = true
+repository = "https://github.com/norm-rs/norm-rs"
+homepage = "https://github.com/norm-rs/norm-rs"
+documentation = "https://docs.rs/pdn-rs"
+
+[features]
+default = ["alloc"]
+std = ["alloc", "rfe-types/std"]
+alloc = []
+
+[dependencies]
+rfe-types = { workspace = true, default-features = false }
+
+[dev-dependencies]
+proptest = { workspace = true }
+criterion = { workspace = true }
+
+[[bench]]
+name = "pdn"
+harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
