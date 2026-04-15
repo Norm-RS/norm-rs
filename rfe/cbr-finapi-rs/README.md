@@ -1,4 +1,8 @@
-# cbr-finapi-rs
+# CBR FinAPI RS
+
+[![Crates.io](https://img.shields.io/crates/v/cbr-finapi-rs.svg)](https://crates.io/crates/cbr-finapi-rs)
+[![Documentation](https://docs.rs/cbr-finapi-rs/badge.svg)](https://docs.rs/cbr-finapi-rs)
+[![License](https://img.shields.io/crates/l/cbr-finapi-rs.svg)](https://github.com/Norm-RS/norm-rs/blob/main/rfe/cbr-finapi-rs/LICENSE)
 
 Typed Rust client for CBR public interfaces (AntiFraud, TSPI, EBS).
 
