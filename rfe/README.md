@@ -10,10 +10,10 @@ Core Rust workspace for Russian fintech compliance and lending workflows.
 
 ### Wave 1 (April-May 2026, first publish target)
 
-- [`rfe-types`](rfe/rfe-types/README.md)
-- [`pdn-rs`](rfe/pdn-rs/README.md)
-- [`cbr-finapi-rs`](rfe/cbr-finapi-rs/README.md)
-- [`lending-state-rs`](rfe/lending-state-rs/README.md)
+- [`rfe-types`](rfe-types/README.md)
+- [`pdn-rs`](pdn-rs/README.md)
+- [`cbr-finapi-rs`](cbr-finapi-rs/README.md)
+- [`lending-state-rs`](lending-state-rs/README.md)
 
 ### Wave 2 (planned)
 
