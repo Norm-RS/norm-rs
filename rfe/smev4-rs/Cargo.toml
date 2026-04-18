@@ -1,0 +1,54 @@
+[package]
+name = "smev4-rs"
+description = "Async SMEV 4 client (REST/OIDC) for Russian banking integrations."
+version.workspace = true
+edition.workspace = true
+license = "Apache-2.0"
+authors.workspace = true
+repository = "https://github.com/norm-rs/norm-rs"
+homepage = "https://github.com/norm-rs/norm-rs"
+documentation = "https://docs.rs/smev4-rs"
+
+[features]
+default = ["alloc"]
+std = [
+    "rfe-types/std",
+    "serde/std",
+    "serde_json/std",
+    "blake3/std",
+    "thiserror/std",
+    "dep:reqwest",
+    "dep:tokio",
+    "dep:quick-xml",
+]
+alloc = ["serde/alloc"]
+gost-export = ["rfe-types/gost-export"]
+
+[dependencies]
+rfe-types = { workspace = true, default-features = false }
+reqwest = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+serde = { workspace = true, default-features = false }
+serde_json = { workspace = true, default-features = false, features = ["alloc"] }
+quick-xml = { workspace = true, optional = true }
+blake3 = { workspace = true, default-features = false }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+mockito = { workspace = true }
+criterion = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+
+[[bench]]
+name = "xml"
+harness = false
+required-features = ["std"]
+
+[[test]]
+name = "integration"
+required-features = ["std"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
