@@ -8,7 +8,10 @@ Asynchronous SMEV 4 (REST/OIDC) client for Russian fintech/regtech integrations.
 - Ready-to-use service clients: FNS (`check_inn_and_income`) and ESIA (`request_user_profile`).
 - Configurable polling with exponential backoff via `PollConfig`.
 - Explicit state-service availability signaling via `SmevError::Unavailable`.
+- Explicit ticket-expiry/not-found path (`404 -> SmevError::Payload`).
+- Public unavailable classification helper: `UnavailableReason::from_http_status`.
 - Audit trail helpers powered by `rfe-types::AuditEntry` and BLAKE3 request fingerprinting.
+- Built-in `tracing` instrumentation in queue polling/audit flow.
 
 ## Regulatory and operational context
 
@@ -62,6 +65,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+## Chained audit example
+
+```rust
+use smev4_rs::{QueueTicket, SmevClient};
+
+async fn audited_chain(client: &SmevClient) {
+    let nonce = [1u8; 32];
+    let (_r1, a1) = client
+        .poll_response_chained(QueueTicket("t1".to_string()), nonce, None)
+        .await;
+
+    let (_r2, _a2) = client
+        .poll_response_chained(QueueTicket("t2".to_string()), nonce, Some(&a1))
+        .await;
+}
+```
+
+## Current version limits
+
+Current `smev4-rs` implements a stable SMEV4 core:
+
+- queue-based flow and configurable polling,
+- typed unavailable path with classification helper,
+- audit helpers and deterministic request fingerprint.
+
+Next-stage items planned for later release:
+
+- unified SMEV3/SMEV4 routing API,
+- structured unavailable payload directly in `SmevError`,
+- stricter contract parsing across all service adapters and cache policy surfaces.
 
 ## Deduplication and audit example
 

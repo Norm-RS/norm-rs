@@ -1,4 +1,4 @@
-use crate::SmevError;
+use crate::{SmevError, UnavailableReason};
 use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(feature = "std")]
@@ -63,6 +63,12 @@ impl SmevClient {
         config: PollConfig,
     ) -> Result<String, SmevError> {
         let url = format!("{}/api/v1/queue/{}", self.base_url, ticket.0);
+        tracing::debug!(
+            ticket = %ticket.0,
+            max_attempts = config.max_attempts,
+            timeout_total_secs = config.timeout_total_secs,
+            "starting SMEV queue polling"
+        );
 
         let mut attempts: u32 = 0;
         let mut delay_ms = config.initial_delay_ms;
@@ -77,19 +83,41 @@ impl SmevClient {
                 let text = res.text().await?;
                 // Check if still processing or ready
                 if !text.contains("<Status>PROCESSING</Status>") {
+                    tracing::debug!(ticket = %ticket.0, attempts, "SMEV queue response ready");
                     return Ok(text);
                 }
-            } else if status.as_u16() == 403 || status.as_u16() == 423 || status.as_u16() == 503 {
+            } else if status.as_u16() == 403
+                || status.as_u16() == 423
+                || status.as_u16() == 429
+                || status.as_u16() == 503
+            {
+                let reason_kind = UnavailableReason::from_http_status(
+                    status.as_u16(),
+                    res.headers().contains_key(reqwest::header::RETRY_AFTER),
+                );
+                tracing::warn!(
+                    ticket = %ticket.0,
+                    status = %status,
+                    reason = ?reason_kind,
+                    "SMEV provider unavailable"
+                );
                 return Err(SmevError::Unavailable {
-                    reason: format!("status {}", status),
+                    reason: format!("{reason_kind:?} ({status})"),
                 });
+            } else if status.as_u16() == 404 {
+                return Err(SmevError::Payload(format!(
+                    "queue ticket not found or expired: {}",
+                    ticket.0
+                )));
             }
 
             attempts += 1;
             if attempts >= config.max_attempts {
+                tracing::warn!(ticket = %ticket.0, attempts, "SMEV polling reached max attempts");
                 return Err(SmevError::Timeout);
             }
             if started.elapsed().as_secs() >= config.timeout_total_secs {
+                tracing::warn!(ticket = %ticket.0, attempts, "SMEV polling timed out");
                 return Err(SmevError::Timeout);
             }
 
@@ -107,6 +135,20 @@ impl SmevClient {
         ticket: QueueTicket,
         nonce: [u8; 32],
     ) -> (Result<String, SmevError>, AuditEntry) {
+        self.poll_response_chained(ticket, nonce, None).await
+    }
+
+    pub async fn poll_response_chained(
+        &self,
+        ticket: QueueTicket,
+        nonce: [u8; 32],
+        previous: Option<&AuditEntry>,
+    ) -> (Result<String, SmevError>, AuditEntry) {
+        tracing::debug!(
+            ticket = %ticket.0,
+            has_previous = previous.is_some(),
+            "polling with chained audit"
+        );
         let result = self.poll_response(ticket).await;
         let ts = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -118,7 +160,10 @@ impl SmevClient {
             Err(SmevError::Timeout) => b"SMEV_TIMEOUT",
             Err(_) => b"SMEV_ERROR",
         };
-        let audit = AuditEntry::genesis(ts, payload, Some(&nonce));
+        let audit = match previous {
+            Some(prev) => AuditEntry::next(prev, ts, payload, Some(&nonce)),
+            None => AuditEntry::genesis(ts, payload, Some(&nonce)),
+        };
         (result, audit)
     }
 
@@ -179,6 +224,7 @@ impl SmevClientBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rfe_types::AuditEntry;
 
     #[test]
     fn fingerprint_is_deterministic() {
@@ -187,5 +233,33 @@ mod tests {
         let c = SmevClient::request_fingerprint(b"payload2");
         assert_eq!(a, b);
         assert_ne!(a, c);
+    }
+
+    #[test]
+    fn unavailable_reason_mapping() {
+        assert_eq!(
+            UnavailableReason::from_http_status(403, false),
+            UnavailableReason::ProviderAccessDenied
+        );
+        assert_eq!(
+            UnavailableReason::from_http_status(429, false),
+            UnavailableReason::QuotaOrRateLimit
+        );
+        assert_eq!(
+            UnavailableReason::from_http_status(503, false),
+            UnavailableReason::ServiceDegraded
+        );
+        assert_eq!(
+            UnavailableReason::from_http_status(503, true),
+            UnavailableReason::QuotaOrRateLimit
+        );
+    }
+
+    #[test]
+    fn chained_audit_links_to_previous_head() {
+        let nonce = [7u8; 32];
+        let first = AuditEntry::genesis(10, b"FIRST", Some(&nonce));
+        let second = AuditEntry::next(&first, 20, b"SECOND", Some(&nonce));
+        assert_eq!(second.parent_hash, first.entry_hash);
     }
 }

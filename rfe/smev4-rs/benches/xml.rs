@@ -1,6 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use quick_xml::events::Event;
 use quick_xml::Reader;
+use smev4_rs::services::FnsCheckResponse;
 
 fn generate_large_xml() -> String {
     let snippet = r#"
@@ -46,6 +47,15 @@ fn bench_xml_parsing(c: &mut Criterion) {
         b.iter(|| {
             let cnt = parse_record_count(black_box(&xml));
             black_box(cnt)
+        })
+    });
+
+    let response =
+        "<Response><IsValid>true</IsValid><IncomeConfirmed>true</IncomeConfirmed></Response>";
+    c.bench_function("fns_parse_xml_strict", |b| {
+        b.iter(|| {
+            let parsed = FnsCheckResponse::parse_xml_strict(black_box(response)).unwrap();
+            black_box(parsed.is_valid)
         })
     });
 }

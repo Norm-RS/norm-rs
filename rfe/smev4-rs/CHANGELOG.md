@@ -1,5 +1,32 @@
 # Changelog: smev4-rs
 
+## [0.1.1] - 2026-04-28
+
+### Added
+
+- New public `UnavailableReason` enum and classifier helper `UnavailableReason::from_http_status`.
+- New chained audit helper `poll_response_chained(ticket, nonce, previous)` for continuous `AuditEntry` linking.
+- New strict parser method `FnsCheckResponse::parse_xml_strict`.
+- New benchmark `fns_parse_xml_strict`.
+- New tests for:
+- unavailable reason mapping,
+- strict XML parsing success/failure,
+- XML escaping behavior,
+- `429 -> Unavailable` mapping,
+- chained audit continuity.
+
+### Changed
+
+- `poll_response_audited` is now implemented via `poll_response_chained(..., None)` for consistent behavior.
+- Unavailable mapping now also covers HTTP `429` and includes reason classification in the error message.
+- Added `tracing` instrumentation in queue polling and chained-audit flow.
+
+### Fixed
+
+- XML payload construction now escapes values before insertion in FNS/ESIA request builders to prevent malformed XML and injection-prone payloads.
+- Polling now returns explicit `Payload` error for HTTP `404` queue ticket path (not found/expired) instead of timing out after retries.
+- Removed redundant `core::convert::Into` import in `rsocket.rs`.
+
 ## [0.1.0] - 2026-04-18
 
 Initial public release, including pre-release hardening and review-driven fixes.

@@ -1,0 +1,90 @@
+[workspace]
+resolver = "2"
+members = [
+    "rfe/rfe-types",
+    "rfe/pdn-rs",
+    "rfe/cbr-finapi-rs",
+    "rfe/lending-state-rs",
+    "rfe/smev4-rs",
+    "trust-box/trust-box-core",
+    "trust-box/trust-box-firmware", "risk-lens/backend-rs",
+]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["NORM Authors"]
+
+[workspace.dependencies]
+# Serialization
+serde = { version = "=1.0.219", default-features = false, features = ["derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde-json-core = "0.6"
+
+# Financial
+rust_decimal = { version = "1", default-features = false, features = ["serde-with-str", "maths"] }
+rfe-types = { version = "0.1.0", path = "rfe/rfe-types", default-features = false }
+pdn-rs = { version = "0.1.0", path = "rfe/pdn-rs", default-features = false }
+cbr-finapi-rs = { version = "0.1.0", path = "rfe/cbr-finapi-rs", default-features = false }
+lending-state-rs = { version = "0.1.0", path = "rfe/lending-state-rs", default-features = false }
+smev4-rs = { version = "0.1.1", path = "rfe/smev4-rs", default-features = false }
+trust-box-core = { version = "0.1.0", path = "trust-box/trust-box-core", default-features = false }
+
+# Hashing & IDs
+blake3 = { version = "1", default-features = false }
+uuid = { version = "1", default-features = false, features = ["serde"] }
+
+# Errors
+thiserror = { version = "2", default-features = false }
+
+# XML & Async Utilities
+quick-xml = { version = "0.36", features = ["serialize"] }
+chrono = { version = "0.4", default-features = false, features = ["serde", "alloc"] }
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+tracing = { version = "0.1", default-features = false }
+axum = "0.8"
+tower-http = { version = "0.6", features = ["cors"] }
+lru = "0.13"
+
+# Testing & Benches
+proptest = "1"
+mockito = "1"
+trybuild = "1"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Cryptography (GOST R 34.11-2012)
+streebog = { version = "0.10", default-features = false }
+
+# Embedded / ESP
+esp-hal = { version = "=1.0.0-rc.0", features = ["esp32s3", "unstable", "log-04"] }
+esp-alloc = "0.8.0"
+esp-println = { version = "0.16.1", features = ["esp32s3", "auto"] }
+esp-backtrace = { version = "0.18.1", features = ["esp32s3", "panic-handler", "println"] }
+esp-wifi = { version = "0.15.1", default-features = false, features = ["esp32s3", "wifi", "log-04", "esp-alloc", "builtin-scheduler"] }
+embassy-executor = { version = "0.7.0", features = ["executor-thread", "task-arena-size-16384"] }
+embassy-time = "0.5.1"
+embassy-net = { version = "0.8.0", features = ["tcp", "udp", "proto-ipv4", "medium-ethernet"] }
+embassy-futures = "0.1.1"
+embassy-sync = "0.7.2"
+embedded-hal = "1.0"
+embedded-io-async = "0.7.0"
+static_cell = "2.1.0"
+heapless = "0.8"
+esp-bootloader-esp-idf = { version = "0.4.0", features = ["esp32s3"] }
+esp-hal-embassy = { version = "0.9.1", features = ["esp32s3", "log-04"] }
+embedded-sdmmc = { version = "0.8" }
+
+
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "s"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+
+[profile.release.build-override]
+strip = "none"

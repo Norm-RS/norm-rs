@@ -1,4 +1,5 @@
 use mockito::Server;
+use rfe_types::AuditEntry;
 use rfe_types::Inn;
 use smev4_rs::{AuthProvider, PollConfig, QueueTicket, SmevClient, SmevError};
 
@@ -107,6 +108,122 @@ async fn test_poll_response_returns_unavailable_on_service_lock() {
     }
 
     mock_poll.assert_async().await;
+}
+
+#[tokio::test]
+async fn test_poll_response_maps_429_to_unavailable() {
+    let mut server = Server::new_async().await;
+
+    let mock_poll = server
+        .mock("GET", "/api/v1/queue/rate_ticket")
+        .with_status(429)
+        .with_header("Retry-After", "3")
+        .with_body("rate limited")
+        .create_async()
+        .await;
+
+    let client = SmevClient::builder()
+        .base_url(server.url())
+        .build()
+        .unwrap();
+
+    let err = client
+        .poll_response_with_config(
+            QueueTicket("rate_ticket".to_string()),
+            PollConfig {
+                max_attempts: 1,
+                initial_delay_ms: 0,
+                max_delay_ms: 0,
+                timeout_total_secs: 1,
+            },
+        )
+        .await
+        .unwrap_err();
+
+    match err {
+        SmevError::Unavailable { reason } => assert!(reason.contains("QuotaOrRateLimit")),
+        other => panic!("expected Unavailable, got {other:?}"),
+    }
+
+    mock_poll.assert_async().await;
+}
+
+#[tokio::test]
+async fn test_poll_response_404_returns_payload_error() {
+    let mut server = Server::new_async().await;
+
+    let mock_poll = server
+        .mock("GET", "/api/v1/queue/missing_ticket")
+        .with_status(404)
+        .with_body("not found")
+        .create_async()
+        .await;
+
+    let client = SmevClient::builder()
+        .base_url(server.url())
+        .build()
+        .unwrap();
+
+    let err = client
+        .poll_response_with_config(
+            QueueTicket("missing_ticket".to_string()),
+            PollConfig {
+                max_attempts: 3,
+                initial_delay_ms: 0,
+                max_delay_ms: 0,
+                timeout_total_secs: 1,
+            },
+        )
+        .await
+        .unwrap_err();
+
+    match err {
+        SmevError::Payload(msg) => assert!(msg.contains("queue ticket not found or expired")),
+        other => panic!("expected Payload error, got {other:?}"),
+    }
+
+    mock_poll.assert_async().await;
+}
+
+#[tokio::test]
+async fn test_poll_response_chained_audit_first_and_next() {
+    let mut server = Server::new_async().await;
+
+    let _m1 = server
+        .mock("GET", "/api/v1/queue/chained_1")
+        .with_status(200)
+        .with_body("<Response><Status>DONE</Status></Response>")
+        .create_async()
+        .await;
+
+    let _m2 = server
+        .mock("GET", "/api/v1/queue/chained_2")
+        .with_status(200)
+        .with_body("<Response><Status>DONE</Status></Response>")
+        .create_async()
+        .await;
+
+    let client = SmevClient::builder()
+        .base_url(server.url())
+        .build()
+        .unwrap();
+
+    let nonce = [9u8; 32];
+    let (_r1, a1) = client
+        .poll_response_chained(QueueTicket("chained_1".to_string()), nonce, None)
+        .await;
+    let (_r2, a2) = client
+        .poll_response_chained(QueueTicket("chained_2".to_string()), nonce, Some(&a1))
+        .await;
+
+    let expected = AuditEntry::next(
+        &a1,
+        a2.created_at_micros,
+        b"<Response><Status>DONE</Status></Response>",
+        Some(&nonce),
+    );
+    assert_eq!(a2.parent_hash, a1.entry_hash);
+    assert_eq!(a2.entry_hash, expected.entry_hash);
 }
 
 #[test]

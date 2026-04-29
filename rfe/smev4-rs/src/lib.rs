@@ -20,6 +20,26 @@ pub mod services;
 pub use client::{AuthProvider, PollConfig, QueueTicket, SmevClient};
 pub use rsocket::{RSocketClient, RSocketFrame};
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum UnavailableReason {
+    ProviderAccessDenied,
+    QuotaOrRateLimit,
+    ServiceDegraded,
+    Other(alloc::string::String),
+}
+
+impl UnavailableReason {
+    pub fn from_http_status(status: u16, has_retry_after: bool) -> Self {
+        match status {
+            403 | 423 => Self::ProviderAccessDenied,
+            429 => Self::QuotaOrRateLimit,
+            503 if has_retry_after => Self::QuotaOrRateLimit,
+            503 => Self::ServiceDegraded,
+            _ => Self::Other(alloc::format!("status {status}")),
+        }
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum SmevError {
     #[cfg(feature = "std")]
