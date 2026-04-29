@@ -1,4 +1,4 @@
-# smev4-rs
+# SMEV4 RS
 
 [![Crates.io](https://img.shields.io/crates/v/smev4-rs.svg)](https://crates.io/crates/smev4-rs)
 [![Documentation](https://docs.rs/smev4-rs/badge.svg)](https://docs.rs/smev4-rs)
