@@ -1,5 +1,9 @@
 # smev4-rs
 
+[![Crates.io](https://img.shields.io/crates/v/smev4-rs.svg)](https://crates.io/crates/smev4-rs)
+[![Documentation](https://docs.rs/smev4-rs/badge.svg)](https://docs.rs/smev4-rs)
+[![License](https://img.shields.io/crates/l/smev4-rs.svg)](https://github.com/Norm-RS/norm-rs/blob/main/rfe/smev4-rs/LICENSE)
+
 Asynchronous SMEV 4 (REST/OIDC) client for Russian fintech/regtech integrations.
 
 ## What this crate provides
