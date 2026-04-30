@@ -15,10 +15,10 @@ Core Rust workspace for Russian fintech compliance and lending workflows.
 - [`cbr-finapi-rs`](cbr-finapi-rs/README.md)
 - [`lending-state-rs`](lending-state-rs/README.md)
 
-### Wave 2 (planned)
+### Wave 2
 
-- `smev4-rs`
-- `xbrl-cbr-rs`
+- [`smev4-rs`](smev4-rs/README.md)
+- `xbrl-cbr-rs` (planned)
 
 ## Layered Architecture
 
