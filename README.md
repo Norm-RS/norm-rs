@@ -14,4 +14,4 @@ This monorepo unites the domain logic, analyst tooling, and hardware-hardened ex
    - [`pdn-rs`](rfe/pdn-rs/README.md): Implements 6960-U / 7226-U (Debt Service-to-Income / PDN calculations).
    - [`cbr-finapi-rs`](rfe/cbr-finapi-rs/README.md): Implements Federal Law 161-FZ (12 Antifraud Criteria).
    - [`lending-state-rs`](rfe/lending-state-rs/README.md): Typestate FSM for lending and BNPL lifecycles with compile-time transition safety.
-   - [`smev4-rs](rfe/smev4-rs/README.md): Asynchronous SMEV 4 (REST/OIDC) client for Russian fintech/regtech integrations.
+   - [`smev4-rs`](rfe/smev4-rs/README.md): Asynchronous SMEV 4 (REST/OIDC) client for Russian fintech/regtech integrations.
